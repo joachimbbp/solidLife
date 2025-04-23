@@ -67,13 +67,6 @@ const [startPos, setStartPos] = createSignal<{ x: number; y: number } | null>(nu
     return false
   }
 
-  //Mouse functionality
-
-
-
-
-  //mouse end
-
   const step = () => {
     const current = grid();
     const next = current.map((row, rowIndex) =>
@@ -83,6 +76,8 @@ const [startPos, setStartPos] = createSignal<{ x: number; y: number } | null>(nu
     );
     setGrid(next)
   };
+
+
 
   const draw = () => {
     const ctx = canvasRef()?.getContext('2d');
@@ -98,6 +93,8 @@ const [startPos, setStartPos] = createSignal<{ x: number; y: number } | null>(nu
       }
     }
   };
+
+
 
   onMount(() => {
     const interval = setInterval(() => {
@@ -123,19 +120,36 @@ const [startPos, setStartPos] = createSignal<{ x: number; y: number } | null>(nu
             const pos = getMousePos(e);
             setIsHolding(true);
             setStartPos(pos);
-            console.log("Pointer down at: ", pos)
+            const row = Math.floor(pos.y / cellSize);
+            const col = Math.floor(pos.x / cellSize);
+            setGrid(prev =>
+              prev.map((r, rIdx) =>
+                r.map((c, cIdx) =>
+                  rIdx === row && cIdx === col ? true : c
+                )
+              )
+            );
           };
-
           const handlePointerMove = (e: PointerEvent) => {
             if (isHolding()) {
               const pos = getMousePos(e);
-              console.log("Moving while holding at:", pos);
+          
+              const row = Math.floor(pos.y / cellSize);
+              const col = Math.floor(pos.x / cellSize);
+          
+              setGrid(prev =>
+                prev.map((r, rIdx) =>
+                  r.map((c, cIdx) =>
+                    rIdx === row && cIdx === col ? true : c
+                  )
+                )
+              );
             }
           };
+          
       
           const handlePointerUp = () => {
             setIsHolding(false);
-            console.log("Pointer up");
           };
       
           el.addEventListener("pointerdown", handlePointerDown);
