@@ -46,8 +46,8 @@ function applyRules(grid: boolean[][], row: number, col: number): boolean{
 
 
 function Life(){
-  const rows = 50;
-  const cols = 100;
+  const rows = 70;
+  const cols = 120;
   
   const initialGrid = Array.from({ length: rows }, () =>
     Array.from({length: cols}, () => Math.random() < 0.1));
@@ -73,14 +73,14 @@ function Life(){
 
 
 
-    }, 1000);
+    }, 200);
     onCleanup(() => clearInterval(interval));
   });
   
     return (
           <pre style={{"font-family":"monospace",
             "white-space":"pre",
-            "line-height": "1em",
+            "line-height": "0.5em",
             "font-size":"16px"}}>
           <For each={grid()}>
             {row =>(
