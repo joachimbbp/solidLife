@@ -78,8 +78,72 @@ function Life(){
     setGrid(next)
   };
 
-
-
+  
+  type NeighborMap = {
+    north: boolean;
+    south: boolean;
+    east: boolean;
+    west: boolean;
+    northEast?: boolean;
+    northWest?: boolean;
+    southEast?: boolean;
+    southWest?: boolean;
+  };
+  
+  function drawTiledCell(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    size: number,
+    neighbors: NeighborMap
+  ): void {
+    const r = size / 3; // corner radius
+  
+    ctx.beginPath();
+  
+    // Start top-left corner
+    if (!neighbors.north && !neighbors.west) {
+      ctx.moveTo(x + r, y);
+    } else {
+      ctx.moveTo(x, y);
+    }
+  
+    // Top edge
+    if (!neighbors.north) {
+      ctx.lineTo(x + size - r, y);
+      ctx.quadraticCurveTo(x + size, y, x + size, y + r); // Top-right corner
+    } else {
+      ctx.lineTo(x + size, y);
+    }
+  
+    // Right edge
+    if (!neighbors.east) {
+      ctx.lineTo(x + size, y + size - r);
+      ctx.quadraticCurveTo(x + size, y + size, x + size - r, y + size); // Bottom-right
+    } else {
+      ctx.lineTo(x + size, y + size);
+    }
+  
+    // Bottom edge
+    if (!neighbors.south) {
+      ctx.lineTo(x + r, y + size);
+      ctx.quadraticCurveTo(x, y + size, x, y + size - r); // Bottom-left
+    } else {
+      ctx.lineTo(x, y + size);
+    }
+  
+    // Left edge
+    if (!neighbors.west) {
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y); // Back to top-left
+    } else {
+      ctx.lineTo(x, y);
+    }
+  
+    ctx.closePath();
+    ctx.fill();
+  }
+  
   const draw = () => {
     const ctx = canvasRef()?.getContext('2d');
     if (!ctx) return;
@@ -88,9 +152,15 @@ function Life(){
     const data = grid();
     for (let row=0; row<rows; row++){
       for (let col=0; col<cols; col++){
-        ctx.fillStyle = data[row][col] ? 'black' : 'white';
-        ctx.fillRect(col* cellSize, row * cellSize, cellSize, cellSize)
-        //ctx.fillStyle() perhaps this one can spice things up?
+        const cell = data[row][col];
+        if (cell) {
+          drawTiledCell(ctx, col * cellSize, row * cellSize, cellSize, {
+            north: data[row - 1]?.[col] ?? false,
+            south: data[row + 1]?.[col] ?? false,
+            east: data[row]?.[col + 1] ?? false,
+            west: data[row]?.[col - 1] ?? false,
+          });
+        }
       }
     }
   };
