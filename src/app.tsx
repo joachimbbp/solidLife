@@ -3,7 +3,7 @@ import { Router } from "@solidjs/router";
 import { FileRoutes } from "@solidjs/start/router";
 import "./app.css";
 
-import { createSignal, For, onCleanup, onMount, createEffect } from "solid-js";
+import { createSignal, For, onCleanup, onMount, createEffect, Show } from "solid-js";
 
 //■
 
@@ -11,13 +11,22 @@ function Life(){
   const rows = 70;
   const cols = 120;
   const cellSize = 10;
-  const [canvasRef, setCanvasRef] = createSignal<HTMLCanvasElement | undefined>(undefined);
+  const [canvasRef, setCanvasRef] = createSignal<HTMLCanvasElement | undefined>();
+const [isHolding, setIsHolding] = createSignal(false);
+const [startPos, setStartPos] = createSignal<{ x: number; y: number } | null>(null);
 
+  const [mounted, setMounted] = createSignal(false);
 
   const [grid, setGrid] = createSignal(
     Array.from({ length: rows},
-      () => Array.from({ length: cols}, () => Math.random() < 0.5)
+      () => Array.from({ length: cols}, () => false)
   ));
+
+  onMount(() => {
+    setMounted(true)
+    const canvas = canvasRef();
+    if (!canvas) return;
+  })
   
   const applyRules = (grid: boolean[][], row: number, col: number): boolean => {
     //If at the edge, just kill it
@@ -58,6 +67,13 @@ function Life(){
     return false
   }
 
+  //Mouse functionality
+
+
+
+
+  //mouse end
+
   const step = () => {
     const current = grid();
     const next = current.map((row, rowIndex) =>
@@ -91,11 +107,52 @@ function Life(){
     onCleanup(() => clearInterval(interval))
   });
   return (
-    <canvas
-    ref={setCanvasRef}
-    width={cols*cellSize}
-    style={{border: '1px solid #ccc'}}
-    />
+    <Show when={mounted()}>
+      <canvas
+        ref={(el) => {
+          setCanvasRef(el)
+          
+          const getMousePos = (e: PointerEvent) =>{
+            const rect = el.getBoundingClientRect();
+            return {
+              x: e.clientX - rect.left,
+              y: e.clientY - rect.top,
+            };
+          };
+          const handlePointerDown = (e: PointerEvent) => {
+            const pos = getMousePos(e);
+            setIsHolding(true);
+            setStartPos(pos);
+            console.log("Pointer down at: ", pos)
+          };
+
+          const handlePointerMove = (e: PointerEvent) => {
+            if (isHolding()) {
+              const pos = getMousePos(e);
+              console.log("Moving while holding at:", pos);
+            }
+          };
+      
+          const handlePointerUp = () => {
+            setIsHolding(false);
+            console.log("Pointer up");
+          };
+      
+          el.addEventListener("pointerdown", handlePointerDown);
+          el.addEventListener("pointermove", handlePointerMove);
+          window.addEventListener("pointerup", handlePointerUp);
+      
+          onCleanup(() => {
+            el.removeEventListener("pointerdown", handlePointerDown);
+            el.removeEventListener("pointermove", handlePointerMove);
+            window.removeEventListener("pointerup", handlePointerUp);
+          });
+        }}
+        width={cols*cellSize}
+        height={rows*cellSize}
+        style={{border: '1px solid #ccc'}}
+      />
+    </Show>
   );
 }
 
