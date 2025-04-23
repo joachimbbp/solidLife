@@ -11,10 +11,11 @@ function Life(){
   const rows = 70;
   const cols = 120;
   const cellSize = 10;
+  const speed = 80; //lower is faster
   const [canvasRef, setCanvasRef] = createSignal<HTMLCanvasElement | undefined>();
-const [isHolding, setIsHolding] = createSignal(false);
-const [startPos, setStartPos] = createSignal<{ x: number; y: number } | null>(null);
-
+  const [isHolding, setIsHolding] = createSignal(false);
+  const [startPos, setStartPos] = createSignal<{ x: number; y: number } | null>(null);
+  const [isErasing, setIsErasing] = createSignal(false);
   const [mounted, setMounted] = createSignal(false);
 
   const [grid, setGrid] = createSignal(
@@ -100,12 +101,13 @@ const [startPos, setStartPos] = createSignal<{ x: number; y: number } | null>(nu
     const interval = setInterval(() => {
       step();
       draw();
-    }, 200);
+    }, speed);
     onCleanup(() => clearInterval(interval))
   });
   return (
     <Show when={mounted()}>
       <canvas
+      onContextMenu={(e) => e.preventDefault()}
         ref={(el) => {
           setCanvasRef(el)
           
@@ -120,12 +122,14 @@ const [startPos, setStartPos] = createSignal<{ x: number; y: number } | null>(nu
             const pos = getMousePos(e);
             setIsHolding(true);
             setStartPos(pos);
+            const erasing = e.button === 2;
+            setIsErasing(erasing);
             const row = Math.floor(pos.y / cellSize);
             const col = Math.floor(pos.x / cellSize);
             setGrid(prev =>
               prev.map((r, rIdx) =>
                 r.map((c, cIdx) =>
-                  rIdx === row && cIdx === col ? true : c
+                  rIdx === row && cIdx === col ? !erasing : c
                 )
               )
             );
@@ -133,17 +137,19 @@ const [startPos, setStartPos] = createSignal<{ x: number; y: number } | null>(nu
           const handlePointerMove = (e: PointerEvent) => {
             if (isHolding()) {
               const pos = getMousePos(e);
-          
-              const row = Math.floor(pos.y / cellSize);
-              const col = Math.floor(pos.x / cellSize);
-          
-              setGrid(prev =>
-                prev.map((r, rIdx) =>
-                  r.map((c, cIdx) =>
-                    rIdx === row && cIdx === col ? true : c
-                  )
+            setIsHolding(true);
+            setStartPos(pos);
+            const erasing = isErasing();
+            setIsErasing(erasing);
+            const row = Math.floor(pos.y / cellSize);
+            const col = Math.floor(pos.x / cellSize);
+            setGrid(prev =>
+              prev.map((r, rIdx) =>
+                r.map((c, cIdx) =>
+                  rIdx === row && cIdx === col ? !erasing : c
                 )
-              );
+              )
+            );
             }
           };
           
