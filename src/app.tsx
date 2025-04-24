@@ -1,6 +1,3 @@
-import { MetaProvider, Title } from "@solidjs/meta";
-import { Router } from "@solidjs/router";
-import { FileRoutes } from "@solidjs/start/router";
 import "./app.css";
 
 import { createSignal, For, onCleanup, onMount, createEffect, Show } from "solid-js";
@@ -16,7 +13,7 @@ function Life(){
   const [startPos, setStartPos] = createSignal<{ x: number; y: number } | null>(null);
   const [isErasing, setIsErasing] = createSignal(false);
   const [mounted, setMounted] = createSignal(false);
-
+  const speed = 100;
   const [grid, setGrid] = createSignal(
     Array.from({ length: rows},
       () => Array.from({ length: cols}, () => false)
@@ -112,7 +109,7 @@ function Life(){
     const interval = setInterval(() => {
       step();
       draw();
-    }, 200);
+    }, speed);
     onCleanup(() => clearInterval(interval))
   });
 
@@ -120,17 +117,15 @@ function Life(){
 
   return (
     <Show when={mounted()}>
-      < div 
-      style={{
-        display: "flex",
-        "justify-content": "center",
+      < div class="life"
 
-      }}
       >
 
       <canvas
+        style={{cursor: isHolding() ? "none":"crosshair"}}
 
         onContextMenu={(e) => e.preventDefault()}
+        
         ref={(el) => {
           setCanvasRef(el)
     
@@ -196,8 +191,14 @@ function Life(){
         width={cols*cellSize}
         height={rows*cellSize}
 
-        style={{cursor: isHolding() ? "none":"crosshair", "background-color": "black"}}
       />
+
+      </div>
+      <div class="info">
+       <hr />
+        <a href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life"> game of life </a><br />
+        Left-click and drag to create life. Right-click and drag to destroy it. <br />
+        Made by <a href="https://joachim.work/"> Joachim</a> <br />
       </div>
     </Show>
   );
