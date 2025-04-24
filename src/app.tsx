@@ -107,6 +107,7 @@ function Life(){
 
 
 
+
   onMount(() => {
     const interval = setInterval(() => {
       step();
@@ -114,29 +115,32 @@ function Life(){
     }, 200);
     onCleanup(() => clearInterval(interval))
   });
+
+
+
   return (
     <Show when={mounted()}>
       < div 
       style={{
         display: "flex",
         "justify-content": "center",
-        height: "100vh",
-        width: "100vw",
+
       }}
       >
 
       <canvas
-      onContextMenu={(e) => e.preventDefault()}
+
+        onContextMenu={(e) => e.preventDefault()}
         ref={(el) => {
           setCanvasRef(el)
-          
-          const getMousePos = (e: PointerEvent) =>{
-            const rect = el.getBoundingClientRect();
-            return {
-              x: e.clientX - rect.left,
-              y: e.clientY - rect.top,
-            };
-          };
+    
+                const getMousePos = (e: PointerEvent) =>{
+                  const rect = el.getBoundingClientRect();
+                  return {
+                    x: e.clientX - rect.left,
+                    y: e.clientY - rect.top,
+                  };
+                };
           const handlePointerDown = (e: PointerEvent) => {
             const pos = getMousePos(e);
             setIsHolding(true);
@@ -186,10 +190,13 @@ function Life(){
             el.removeEventListener("pointermove", handlePointerMove);
             window.removeEventListener("pointerup", handlePointerUp);
           });
+
+          
         }}
         width={cols*cellSize}
         height={rows*cellSize}
-        style={{cursor: "none", "background-color": "black"}}
+
+        style={{cursor: isHolding() ? "none":"crosshair", "background-color": "black"}}
       />
       </div>
     </Show>
