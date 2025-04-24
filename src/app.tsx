@@ -14,7 +14,7 @@ function Life(){
   const [canvasRef, setCanvasRef] = createSignal<HTMLCanvasElement | undefined>();
   const [isHolding, setIsHolding] = createSignal(false);
   const [startPos, setStartPos] = createSignal<{ x: number; y: number } | null>(null);
-
+  const [isErasing, setIsErasing] = createSignal(false);
   const [mounted, setMounted] = createSignal(false);
 
   const [grid, setGrid] = createSignal(
@@ -27,54 +27,62 @@ function Life(){
     const canvas = canvasRef();
     if (!canvas) return;
   })
+
+  type Cell = {
+    alive: boolean;
+    neighbors: number;
+  }
   
-  const applyRules = (grid: boolean[][], row: number, col: number): boolean => {
+  const applyRules = (grid: boolean[][], row: number, col: number): Cell => {
     //If at the edge, just kill it
+    const cell : Cell = { alive: false, neighbors: 0}
+    cell.neighbors = 0;
+
     if (row === 0 || row === rows -1 ||
       col === 0 || col === cols-1){
-        return false;
+        return cell;
       }
 
-    let neighbors = 0;
     //(I think I might have inverted this compass terminology, just heads up!)
     //North
-    if (grid[row][col+1]){neighbors += 1}
+    if (grid[row][col+1]){cell.neighbors += 1}
     //North East
-    if (grid[row+1][col+1]){neighbors += 1}
+    if (grid[row+1][col+1]){cell.neighbors += 1}
     //East
-    if (grid[row+1][col]){neighbors += 1}
+    if (grid[row+1][col]){cell.neighbors += 1}
     //South East
-    if (grid[row+1][col-1]){neighbors +=1}
+    if (grid[row+1][col-1]){cell.neighbors +=1}
     //South
-    if(grid[row][col-1]){neighbors +=1}
+    if(grid[row][col-1]){cell.neighbors +=1}
     //South West
-    if(grid[row-1][col-1]){neighbors+=1}
+    if(grid[row-1][col-1]){cell.neighbors+=1}
     //West
-    if(grid[row-1][col]){neighbors+=1}
+    if(grid[row-1][col]){cell.neighbors+=1}
     //North West
-    if(grid[row-1][col+1]){neighbors+=1}
+    if(grid[row-1][col+1]){cell.neighbors+=1}
   
     // Any live cell with fewer than two live neighbors dies, as if by under-population.
-    if (grid[row][col] && neighbors < 2){return false}
+    if (grid[row][col] && cell.neighbors < 2){cell.alive=false}
     // Any live cell with two or three live neighbors lives on to the next generation.
-    if (grid[row][col] && (neighbors===2 || neighbors ===3)){return true}
+    else if (grid[row][col] && (cell.neighbors===2 || cell.neighbors ===3)){cell.alive=true}
     // Any live cell with more than three live neighbors dies, as if by overpopulation.
-    if((grid[row][col]) && (neighbors >= 3)){return false}
+    else if((grid[row][col]) && (cell.neighbors >= 3)){cell.alive=false}
     // Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
-    if(!grid[row][col] && (neighbors===3)){return true}
+    else if(!grid[row][col] && (cell.neighbors===3)){cell.alive=true}
   
     //I don't think we have any undefined behavior, but just incase, kill it?
-    return false
+    return cell
   }
 
   const step = () => {
     const current = grid();
     const next = current.map((row, rowIndex) =>
       row.map((_, colIndex) => {
-        return applyRules(current, rowIndex, colIndex)
+        return applyRules(current, rowIndex, colIndex).alive
       })
     );
     setGrid(next)
+
   };
 
   
@@ -109,6 +117,7 @@ function Life(){
   return (
     <Show when={mounted()}>
       <canvas
+      onContextMenu={(e) => e.preventDefault()}
         ref={(el) => {
           setCanvasRef(el)
           
@@ -123,12 +132,14 @@ function Life(){
             const pos = getMousePos(e);
             setIsHolding(true);
             setStartPos(pos);
+            const erasing = e.button === 2;
+            setIsErasing(erasing);
             const row = Math.floor(pos.y / cellSize);
             const col = Math.floor(pos.x / cellSize);
             setGrid(prev =>
               prev.map((r, rIdx) =>
                 r.map((c, cIdx) =>
-                  rIdx === row && cIdx === col ? true : c
+                  rIdx === row && cIdx === col ? !erasing : c
                 )
               )
             );
@@ -136,17 +147,19 @@ function Life(){
           const handlePointerMove = (e: PointerEvent) => {
             if (isHolding()) {
               const pos = getMousePos(e);
-          
-              const row = Math.floor(pos.y / cellSize);
-              const col = Math.floor(pos.x / cellSize);
-          
-              setGrid(prev =>
-                prev.map((r, rIdx) =>
-                  r.map((c, cIdx) =>
-                    rIdx === row && cIdx === col ? true : c
-                  )
+            setIsHolding(true);
+            setStartPos(pos);
+            const erasing = isErasing();
+            setIsErasing(erasing);
+            const row = Math.floor(pos.y / cellSize);
+            const col = Math.floor(pos.x / cellSize);
+            setGrid(prev =>
+              prev.map((r, rIdx) =>
+                r.map((c, cIdx) =>
+                  rIdx === row && cIdx === col ? !erasing : c
                 )
-              );
+              )
+            );
             }
           };
           
