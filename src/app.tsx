@@ -8,9 +8,9 @@ import { createSignal, For, onCleanup, onMount, createEffect, Show } from "solid
 //■
 
 function Life(){
-  const rows = 70;
-  const cols = 120;
-  const cellSize = 10;
+  const rows = 150;
+  const cols = 300;
+  const cellSize = 5;
   const [canvasRef, setCanvasRef] = createSignal<HTMLCanvasElement | undefined>();
   const [isHolding, setIsHolding] = createSignal(false);
   const [startPos, setStartPos] = createSignal<{ x: number; y: number } | null>(null);
@@ -97,7 +97,7 @@ function Life(){
       for (let col=0; col<cols; col++){
         const cell = data[row][col];
         if (cell) {
-          ctx.fillStyle = data[row][col] ? 'black':'white';
+          ctx.fillStyle = data[row][col] ? 'white':'black';
           ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
 
         }
@@ -116,6 +116,15 @@ function Life(){
   });
   return (
     <Show when={mounted()}>
+      < div 
+      style={{
+        display: "flex",
+        "justify-content": "center",
+        height: "100vh",
+        width: "100vw",
+      }}
+      >
+
       <canvas
       onContextMenu={(e) => e.preventDefault()}
         ref={(el) => {
@@ -180,8 +189,9 @@ function Life(){
         }}
         width={cols*cellSize}
         height={rows*cellSize}
-        style={{border: '1px solid #ccc'}}
+        style={{cursor: "none", "background-color": "black"}}
       />
+      </div>
     </Show>
   );
 }
