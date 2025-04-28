@@ -1,10 +1,33 @@
 
-.info{
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: #000000; /* or any color you like */
+  color: rgb(255, 255, 255); /* optional */
+  font-family: sans-serif; /* optional */
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+
+.info {
   color: rgb(255, 255, 255);
-  justify-content: center;
+  background-color: rgba(0, 0, 0, 0);
   font-size: 14px;
-  line-height: 2cqh;
-  background-color: rgba(0, 0, 0, 0)}
+  text-align: left;
+  padding: 16px 24px;
+  line-height: 1.6;
+  width: 80%;
+  max-width: 600px;
+  margin: 24px auto;
+  border-radius: 12px;
+  border: 1px solid white;
+  box-shadow: 0 0 8px 2px white; /* ✨ glowing effect */
+  font-family: "Courier New", Courier, monospace;
+}
+
+
 
 .info a {
   color: rgb(255, 255, 255);
@@ -17,21 +40,12 @@
   color: rgb(175, 255, 234);
 }
 
-.life{display: flex;
+.life {
+  display: flex;
   justify-content: center;
-  display: 'block';
-  margin: '12px auto'
-  
+  align-items: center; /* vertical centering if needed */
+  flex-direction: column;
+  background-color: #000000;
+  color: rgb(255, 255, 255);
 }
 
-
-
-html, body {
-  margin: 0;
-  padding: 0;
-  background-color: #000000; /* or any color you like */
-  color: rgb(255, 255, 255); /* optional */
-  font-family: sans-serif; /* optional */
-  height: 100%;
-  width: 100%;
-}

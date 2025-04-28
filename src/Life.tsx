@@ -117,9 +117,7 @@ function Life(){
 
   return (
     <Show when={mounted()}>
-      < div class="life"
-
-      >
+      < div class="life"      >
 
       <canvas
         style={{cursor: isHolding() ? "none":"crosshair"}}
@@ -192,14 +190,20 @@ function Life(){
         height={rows*cellSize}
 
       />
+      </div>
 
-      </div>
-      <div class="info">
-       <hr />
-        <a href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life"> game of life </a><br />
-        Left-click and drag to create life. Right-click and drag to destroy it. <br />
-        Made by <a href="https://joachim.work/"> Joachim</a> <br />
-      </div>
+       <div class="info">
+          Above is a canvas. Left-click and drag to create life. Right-click and drag to destroy it.
+
+        </div>
+
+        <div class="info">
+        <p>
+      This is an implementation of <a href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">Conway's Game of Life</a></p><p> It was made by <a href="https://joachim.work/">Joachim Pfefferkorn</a> using SolidJS. The source code can be found <a href="https://github.com/joachimbbp/solidLife">here</a>.
+      
+      </p>
+</div>
+
     </Show>
   );
 }
