@@ -17,7 +17,7 @@ jobs:
           npm run build
 
       - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4
+        uses: JamesIves/github-pages-deploy-action@v4 #Do I really have to rely on someone elses github actions? Feels like it should be simple enough to hand-roll
         with:
           branch: gh-pages # The branch the action should deploy to.
           folder: build # The folder the action should deploy.
