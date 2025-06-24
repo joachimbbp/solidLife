@@ -47,5 +47,6 @@ html, body {
   flex-direction: column;
   background-color: #000000;
   color: rgb(255, 255, 255);
+   border: 1px solid rgb(111, 111, 111);
 }
 
